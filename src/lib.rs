@@ -4,6 +4,9 @@
 //!
 //! See the [readme](https://github.com/David-OConnor/barnes_hut/blob/main/README.md) for details.
 
+#![allow(non_ascii_idents)]
+#![allow(mixed_script_confusables)]
+
 use std::{fmt, fmt::Formatter};
 
 #[cfg(feature = "encode")]
@@ -99,7 +102,7 @@ impl Cube {
         let z_size = z_max - z_min;
 
         // Coerce to a cube.
-        let mut width = x_size.max(y_size).max(z_size);
+        let width = x_size.max(y_size).max(z_size);
 
         let center = Vec3::new(
             (x_max + x_min) / 2.,
@@ -241,7 +244,7 @@ impl Tree {
     /// Get all leaves relevant to a given target. We use this to create a coarser
     /// version of the tree, containing only the nodes we need to calculate acceleration
     /// on a specific target.
-    pub fn leaves(&self, posit_target: Vec3, id_target: usize, config: &BhConfig) -> Vec<&Node> {
+    pub fn leaves(&self, posit_target: Vec3, _id_target: usize, config: &BhConfig) -> Vec<&Node> {
         let mut result = Vec::new();
 
         if self.nodes.is_empty() {
@@ -325,16 +328,20 @@ fn partition<'a, T: BodyModel>(bodies: &[&'a T], bb: &Cube) -> [Vec<&'a T>; 8] {
     result
 }
 
-type AccFn<'a> = dyn Fn(Vec3, f64, f64) -> Vec3 + Send + Sync + 'a;
+// type AccFn<'a> = dyn Fn(Vec3, f64, f64) -> Vec3 + Send + Sync + 'a;
+// type AccFn<'a> = dyn Fn(Vec3, f64, f64) -> Vec3 + Send + Sync + 'a;
+// type AccFn<'a> = Fn(Vec3, f64, f64) -> Vec3 + Send + Sync + 'a;
+// type AccFn = Fn(Vec3, f64, f64) -> Vec3 + Send + Sync;
 
-/// Calculate Newtonian acceleration using the Barnes Hut algorithm.
-pub fn acc_bh(
+/// Calculate acceleration using the Barnes Hut algorithm. The acceleration function passed
+/// as a parameter is of signature `(acc_dir: Vec3 (unit), mass: f64, distance: f64) -> Vec3'
+pub fn acc_bh<F>(
     posit_target: Vec3,
     id_target: usize,
     tree: &Tree,
     config: &BhConfig,
-    acc_fn: &AccFn,
-) -> Vec3 {
+    acc_fn: &F
+)-> Vec3  where F: Fn(Vec3, f64, f64) -> Vec3 + Send + Sync  {
     // todo: Put back the part checking for self interaction.
     tree.leaves(posit_target, id_target, config)
         .par_iter()
