@@ -31,7 +31,7 @@ impl BodyModel for Body {
 Example use:
 
 ```rust
-use barnes_hut::{self, Tree};
+use barnes_hut::{self, BhConfig, Tree};
 
 fn run_timestep() {
     // Note: `BhConfig` Includes a `Default` implementation.
@@ -59,7 +59,7 @@ fn integrate(bh_config: &BhConfig, tree: &Tree) {
         acc_newton_with_mond(acc_dir, mass, dist, Some(mond_fn), softening_factor_sq)
     };
 
-    let accel = barnes_hut::acc_newton_bh(
+    let accel = barnes_hut::acc_bh(
         posit_target,
         id_target, // Currently unused; set to 0 if you'd like, or the enumeration of bodies.
         tree,

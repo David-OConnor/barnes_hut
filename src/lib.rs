@@ -1,11 +1,8 @@
-//! Code related to calculating acceleration between bodies using the Barnes-Hut
-//! approach. It groups source masses. O(N Log(N)) complexity. Faster than naive
-//! n-body; slower than Fast Multipole (FMM). Using in place of FMM due to its relative
-//! ease of implementation.
+//! This algorithm uses Tree Code to group source bodies, as an approximation. It leads to O(N(log N))
+//! computation time, where `N` is the number of bodies. Canonical use cases include gravity, and charged
+//! particle simulations.
 //!
-//! todo: If you can make this general enough, publish it as a standalone library.
-
-// todo: You can use rayon more throughout this, e.g. during tree construction.
+//! See the [readme](https://github.com/David-OConnor/barnes_hut/blob/main/README.md) for details.
 
 use std::{fmt, fmt::Formatter};
 
@@ -33,9 +30,9 @@ impl Default for BhConfig {
             θ: 0.5,
             max_bodies_per_node: 1,
             max_tree_depth: 15, // todo put back
-            // todo: You have having trouble with the recursion. I think your depth
-            // todo cal logic is causing you to miss sections.
-            // max_tree_depth: 30,
+                                // todo: You have having trouble with the recursion. I think your depth
+                                // todo cal logic is causing you to miss sections.
+                                // max_tree_depth: 30,
         }
     }
 }
@@ -244,12 +241,7 @@ impl Tree {
     /// Get all leaves relevant to a given target. We use this to create a coarser
     /// version of the tree, containing only the nodes we need to calculate acceleration
     /// on a specific target.
-    pub fn leaves(
-        &self,
-        posit_target: Vec3,
-        id_target: usize,
-        config: &BhConfig,
-    ) -> Vec<&Node> {
+    pub fn leaves(&self, posit_target: Vec3, id_target: usize, config: &BhConfig) -> Vec<&Node> {
         let mut result = Vec::new();
 
         if self.nodes.is_empty() {
@@ -336,7 +328,7 @@ fn partition<'a, T: BodyModel>(bodies: &[&'a T], bb: &Cube) -> [Vec<&'a T>; 8] {
 type AccFn<'a> = Box<dyn Fn(Vec3, f64, f64) -> Vec3 + Send + Sync + 'a>;
 
 /// Calculate Newtonian acceleration using the Barnes Hut algorithm.
-pub fn acc_newton_bh(
+pub fn acc_bh(
     posit_target: Vec3,
     id_target: usize,
     tree: &Tree,

@@ -1,6 +1,6 @@
 [package]
 name = "barnes_hut"
-version = "1.0.3"
+version = "1.0.4"
 authors = ["David O'Connor <the_alchemist@fastmail.com>"]
 description = "Fast n-body simluation using the Barnes Hut algorithm"
 keywords = ["n-body", "cosmology", "chemistry", "barnes"]
@@ -22,7 +22,7 @@ edition = "2021"
 [dependencies]
 lin_alg = "^1.0.3"
 #lin_alg = {path="../lin_alg"}
-rayon = "1.10.0"
+rayon = "^1.10.0"
 bincode = { version = "^2.0.0-rc.3", optional = true }
 
 [features]
