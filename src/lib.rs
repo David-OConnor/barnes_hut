@@ -328,20 +328,18 @@ fn partition<'a, T: BodyModel>(bodies: &[&'a T], bb: &Cube) -> [Vec<&'a T>; 8] {
     result
 }
 
-// type AccFn<'a> = dyn Fn(Vec3, f64, f64) -> Vec3 + Send + Sync + 'a;
-// type AccFn<'a> = dyn Fn(Vec3, f64, f64) -> Vec3 + Send + Sync + 'a;
-// type AccFn<'a> = Fn(Vec3, f64, f64) -> Vec3 + Send + Sync + 'a;
-// type AccFn = Fn(Vec3, f64, f64) -> Vec3 + Send + Sync;
-
 /// Calculate acceleration using the Barnes Hut algorithm. The acceleration function passed
-/// as a parameter is of signature `(acc_dir: Vec3 (unit), mass: f64, distance: f64) -> Vec3'
+/// as a parameter has signature `(acc_dir: Vec3 (unit), mass: f64, distance: f64) -> Vec3`
 pub fn acc_bh<F>(
     posit_target: Vec3,
     id_target: usize,
     tree: &Tree,
     config: &BhConfig,
-    acc_fn: &F
-)-> Vec3  where F: Fn(Vec3, f64, f64) -> Vec3 + Send + Sync  {
+    acc_fn: &F,
+) -> Vec3
+where
+    F: Fn(Vec3, f64, f64) -> Vec3 + Send + Sync,
+{
     // todo: Put back the part checking for self interaction.
     tree.leaves(posit_target, id_target, config)
         .par_iter()
