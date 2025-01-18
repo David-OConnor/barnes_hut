@@ -10,13 +10,15 @@ which group target bodies in addition to source ones. Note that FMM methods are 
 good implementation, use that instead of this library. There are currently, as of January 2025, no published implementations
 in Rust.
 
-Uses the Rayon library for parallelization. 
+Uses the Rayon library for parallelization. Uses the [lin_alg](https://crates.io/crates/lin_alg) library for the `Vec3` vector type.
 
 Currently hard-coded for `f64`. Post an issue on Github if you'd like `f32` support.
 
 This library is generic over `Body` and acceleration function . Here's an example of adapting your type for use here:
 
 ```rust
+use lin_alg::f64::Vec3;
+
 impl BodyModel for Body {
     fn posit(&self) -> Vec3 {
         self.posit
@@ -64,7 +66,7 @@ fn integrate(bh_config: &BhConfig, tree: &Tree) {
         id_target, // Currently unused; set to 0 if you'd like, or the enumeration of bodies.
         tree,
         bh_config,
-        Box::new(acc_fn),
+        &acc_fn,
     );
 }
 ```

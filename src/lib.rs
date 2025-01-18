@@ -325,7 +325,7 @@ fn partition<'a, T: BodyModel>(bodies: &[&'a T], bb: &Cube) -> [Vec<&'a T>; 8] {
     result
 }
 
-type AccFn<'a> = Box<dyn Fn(Vec3, f64, f64) -> Vec3 + Send + Sync + 'a>;
+type AccFn<'a> = dyn Fn(Vec3, f64, f64) -> Vec3 + Send + Sync + 'a;
 
 /// Calculate Newtonian acceleration using the Barnes Hut algorithm.
 pub fn acc_bh(
@@ -333,7 +333,7 @@ pub fn acc_bh(
     id_target: usize,
     tree: &Tree,
     config: &BhConfig,
-    acc_fn: AccFn,
+    acc_fn: &AccFn,
 ) -> Vec3 {
     // todo: Put back the part checking for self interaction.
     tree.leaves(posit_target, id_target, config)
