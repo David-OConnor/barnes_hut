@@ -42,7 +42,6 @@ impl Default for BhConfig {
 
 /// We use this to allow for arbitrary body (or particle etc) types in application code to
 /// use this library.
-// If we split this module into a library.
 pub trait BodyModel {
     fn posit(&self) -> Vec3;
     fn mass(&self) -> f64;
@@ -163,10 +162,10 @@ impl fmt::Display for Node {
 #[derive(Debug)]
 /// A recursive tree. Each node can be subdivided  Terminates with `NodeType::NodeTerminal`.
 pub struct Tree {
-    // pub struct Tree<'a> {
     /// Order matters; we index this by `Node::children`.
+    // Note: It doesn't appear that passing in a persistent, pre-allocated nodes Vec from the applicatoni
+    // has a significant impact on tree construction time.
     pub nodes: Vec<Node>,
-    // pub nodes: &'a mut Vec<Node>,
 }
 
 impl Tree {
@@ -175,7 +174,6 @@ impl Tree {
     /// bodies, or it reaches a maximum recursion depth.
     ///
     /// We partially transverse it as-required while calculating the force on a given target.
-    // pub fn new(bodies: &[Body], bb: &Cube, config: &BhConfig) -> Self {
     pub fn new<T: BodyModel>(bodies: &[T], bb: &Cube, config: &BhConfig) -> Self {
         // Convert &[Body] to &[&Body].
         // let body_refs: Vec<&Body> = bodies.iter().collect();
@@ -287,7 +285,6 @@ impl Tree {
 }
 
 /// Compute center of mass as a position, and mass value.
-// fn center_of_mass(bodies: &[&Body]) -> (Vec3, f64) {
 fn center_of_mass<T: BodyModel>(bodies: &[&T]) -> (Vec3, f64) {
     let mut mass = 0.;
     let mut center_of_mass = Vec3::new_zero();
@@ -349,7 +346,7 @@ where
 
             // todo: Not sure why we get 0 here when we check it in `leaves()`.
             // todo: QC this.
-            if dist < 1e-8 {
+            if dist < 1e-10 {
                 return None;
             }
 

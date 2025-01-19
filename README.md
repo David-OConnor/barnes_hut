@@ -5,7 +5,7 @@
 
 This algorithm uses Tree Code to group source bodies, as an approximation. It leads to $O(n \log{} n)$ computation time, where $n$ is the number of bodies. Canonical use cases include gravity, and charged particle simulations.
 
-This is much faster than a naive N-body approach $O(n^2)$, at high body counts. It is slower than Fast Multiple Methods (FMM), which group target bodies in addition to source ones. $O(n)$ Note that FMM methods are more difficult to implement, but if you have a good implementation, use that instead of this library. There are currently, as of January 2025, no published implementations in Rust.
+This is much faster than a naive N-body approach $O(n^2)$, at high body counts. It is slower than Fast Multipole Methods (FMM), which group target bodies in addition to source ones. $O(n)$ Note that FMM are more difficult to implement; if you have a good implementation, use that instead of this library. There are currently, as of January 2025, no published implementations in Rust.
 
 It uses the [Rayon library](https://docs.rs/rayon/latest/rayon/) to parallelize of the loop summing forces from each source on a given target. You may wish to also parallelize the loop over targets in your application code.
 
@@ -20,8 +20,6 @@ use lin_alg::f64::Vec3;
 
 impl BodyModel for Body {
     fn posit(&self) -> Vec3 {
-        // Convert to the `lin_alg::f64::Vec3` type here, if not using it directly in your application:
-        // Vec3::new(self.posit.x, self.posit.y, self.posit.z)
         self.posit
     }
 
