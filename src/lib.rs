@@ -48,6 +48,7 @@ pub trait BodyModel {
 }
 
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 /// A cubical bounding box. length=width=depth.
 pub struct Cube {
     pub center: Vec3,
