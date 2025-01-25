@@ -1,6 +1,6 @@
 [package]
 name = "barnes_hut"
-version = "1.0.5"
+version = "1.0.6"
 authors = ["David O'Connor <the_alchemist@fastmail.com>"]
 description = "Fast n-body simluation using the Barnes Hut algorithm"
 keywords = ["n-body", "cosmology", "chemistry", "barnes"]
