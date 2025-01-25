@@ -7,6 +7,8 @@
 #![allow(non_ascii_idents)]
 #![allow(mixed_script_confusables)]
 
+// todo: Ideally make generic over f32 and f64, but we don't have a good way to do that with Vec3.
+
 use std::{fmt, fmt::Formatter};
 
 #[cfg(feature = "encode")]
@@ -267,7 +269,7 @@ impl Tree {
     /// Get all leaves relevant to a given target. We use this to create a coarser
     /// version of the tree, containing only the nodes we need to calculate acceleration
     /// on a specific target.
-    pub fn leaves(&self, posit_target: Vec3, _id_target: usize, config: &BhConfig) -> Vec<&Node> {
+    pub fn leaves(&self, posit_target: Vec3, config: &BhConfig) -> Vec<&Node> {
         let mut result = Vec::new();
 
         if self.nodes.is_empty() {
@@ -369,7 +371,7 @@ where
     F: Fn(Vec3, f64, f64) -> Vec3 + Send + Sync,
 {
     // todo: Put back the part checking for self interaction.
-    tree.leaves(posit_target, id_target, config)
+    tree.leaves(posit_target, config)
         .par_iter()
         .filter_map(|leaf| {
             if leaf.body_ids.contains(&id_target) {
