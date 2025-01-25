@@ -3,6 +3,8 @@
 [![Crate](https://img.shields.io/crates/v/barnes_hut.svg)](https://crates.io/crates/barnes_hut)
 [![Docs](https://docs.rs/lin_alg/badge.svg)](https://docs.rs/barnes_hut)
 
+![Visualization of cubes from this library](/tree.png)
+
 This algorithm uses Tree Code to group source bodies, as an approximation. It leads to $O(n \log{} n)$ computation time, where $n$ is the number of bodies. Canonical use cases include gravity, and charged particle simulations.
 
 This is much faster than a naive N-body approach $O(n^2)$, at high body counts. It is slower than Fast Multipole Methods (FMM), which group target bodies in addition to source ones. $O(n)$ Note that FMM are more difficult to implement; if you have a good implementation, use that instead of this library. There are currently, as of January 2025, no published implementations in Rust.
