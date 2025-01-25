@@ -70,7 +70,6 @@ fn integrate(bh_config: &BhConfig, tree: &Tree, target: Body, id_target: usize) 
     let accel = barnes_hut::acc_bh(
         target.posit,
         // `id_target` is used to prevent self-interaction.
-        // It is not strictly required, as we also perform a distance check.
         id_target,
         tree,
         bh_config,

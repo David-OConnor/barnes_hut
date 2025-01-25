@@ -357,6 +357,7 @@ fn partition<'a, T: BodyModel>(
 
 /// Calculate acceleration using the Barnes Hut algorithm. The acceleration function passed
 /// as a parameter has signature `(acc_dir: Vec3 (unit), mass: f64, distance: f64) -> Vec3`
+/// `id_target` is the index in the body array used to make the tree; it prevents self-interaction.
 pub fn acc_bh<F>(
     posit_target: Vec3,
     id_target: usize,
@@ -373,7 +374,6 @@ where
         .filter_map(|leaf| {
             if leaf.body_ids.contains(&id_target) {
                 // Prevent self-interaction.
-                // println!("Self interaction"); // todo temp
                 return None;
             }
 
