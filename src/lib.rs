@@ -374,7 +374,7 @@ where
             if leaf.body_ids.contains(&id_target) {
                 // Prevent self-interaction.
                 // println!("Self interaction"); // todo temp
-                return None
+                return None;
             }
 
             let acc_diff = leaf.center_of_mass - posit_target;
