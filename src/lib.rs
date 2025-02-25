@@ -2,12 +2,13 @@
 //! computation time, where `N` is the number of bodies. Canonical use cases include gravity, and charged
 //! particle simulations.
 //!
-//! See the [readme](https://github.com/David-OConnor/barnes_hut/blob/main/README.md) for details.
+//! See the [readme](https://github.com/David-OConnor/barnes_hut/blob/main/README.md) for details,
+//! including an example.
 
 #![allow(non_ascii_idents)]
 #![allow(mixed_script_confusables)]
 
-// todo: Ideally make generic over f32 and f64, but we don't have a good way to do that with Vec3.
+// todo: Ideally make generic over f32 and f64, but we don't have a good way to do that with `Vec3`.
 
 use std::{fmt, fmt::Formatter};
 
@@ -144,7 +145,6 @@ pub struct Node {
     /// We use `id` while building the tree, then sort by it, replacing with index.
     /// Once complete, `id` == index in `Tree::nodes`.
     /// Mass, center-of-mass, and body_ids include those from all sub-nodes.
-    /// todo: `body_ids` could easily get out of hand.
     pub id: usize,
     pub bounding_box: Cube,
     /// Node indices in the tree. We use this to guide the transversal process while finding
@@ -181,8 +181,7 @@ impl Tree {
     ///
     /// We partially transverse it as-required while calculating the force on a given target.
     pub fn new<T: BodyModel>(bodies: &[T], bb: &Cube, config: &BhConfig) -> Self {
-        // Convert &[Body] to &[&Body].
-        // let body_refs: Vec<&Body> = bodies.iter().collect();
+        // Convert &[T] to &[&T].
         let body_refs: Vec<&T> = bodies.iter().collect();
 
         // todo: Refine this guess A/R.
@@ -199,10 +198,8 @@ impl Tree {
 
         stack.push((body_refs.to_vec(), body_ids_init, bb.clone(), None, 0));
 
-        // while let Some((bodies_, bb_, parent_id, depth)) = stack.pop() {
         while let Some((bodies_, body_ids, bb_, parent_id, depth)) = stack.pop() {
             if depth > config.max_tree_depth {
-                // eprintln!("Tree generation: Max recusion depth exceeded.");
                 break;
             }
             let (center_of_mass, mass) = center_of_mass(&bodies_);
@@ -239,22 +236,11 @@ impl Tree {
 
                         // todo: The clone etc?
                         for (body, id) in &bodies_by_octant[i] {
-                            bto.push(body.clone());
+                            bto.push(*body);
                             ids_this_octant.push(*id);
                         }
 
-                        // let bodies_this_octant_ = bodies_by_octant[i].iter().enumerate().map(|(_, body)| body).collect();
-                        // let body_ids_this_octant = bodies_by_octant[i].iter().enumerate().map(|(id, _)| id).collect();
-
-                        stack.push((
-                            bto,
-                            ids_this_octant,
-                            // bodies_this_octant_,
-                            // body_ids_this_octant,
-                            octant,
-                            Some(node_id),
-                            depth + 1,
-                        ));
+                        stack.push((bto, ids_this_octant, octant, Some(node_id), depth + 1));
                     }
                 }
             }
@@ -291,12 +277,6 @@ impl Tree {
 
             let dist = (posit_target - node.center_of_mass).magnitude();
 
-            // Avoid self-interaction based on distance or id_target.
-            // todo: Use id_target, if able.
-            // if dist < 1e-10 {
-            //     continue;
-            // }
-
             if node.bounding_box.width / dist < config.θ {
                 result.push(node);
             } else {
@@ -330,13 +310,11 @@ fn center_of_mass<T: BodyModel>(bodies: &[&T]) -> (Vec3, f64) {
 }
 
 /// Partition bodies into each of the 8 octants.
-// fn partition<'a, T: BodyModel>(bodies: &[&'a T], bb: &Cube) -> [Vec<&'a T>; 8] {
 fn partition<'a, T: BodyModel>(
     bodies: &[&'a T],
     body_ids: &[usize],
     bb: &Cube,
 ) -> [Vec<(&'a T, usize)>; 8] {
-    // let mut result: [Vec<&T>; 8] = Default::default();
     let mut result: [Vec<(&'a T, usize)>; 8] = Default::default();
 
     for (i, body) in bodies.iter().enumerate() {
@@ -370,7 +348,6 @@ pub fn acc_bh<F>(
 where
     F: Fn(Vec3, f64, f64) -> Vec3 + Send + Sync,
 {
-    // todo: Put back the part checking for self interaction.
     tree.leaves(posit_target, config)
         .par_iter()
         .filter_map(|leaf| {
@@ -381,12 +358,6 @@ where
 
             let acc_diff = leaf.center_of_mass - posit_target;
             let dist = acc_diff.magnitude();
-
-            // todo: Not sure why we get 0 here when we check it in `leaves()`.
-            // todo: QC this.
-            // if dist < 1e-10 {
-            //     return None;
-            // }
 
             let acc_dir = acc_diff / dist; // Unit vec
 

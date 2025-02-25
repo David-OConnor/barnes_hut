@@ -35,6 +35,7 @@ Example use:
 
 ```rust
 use barnes_hut::{self, BhConfig, Tree};
+use rayon::prelude::*;
 
 fn run_timesteps() {
     // Note: `BhConfig` Includes a `Default` implementation.
@@ -53,10 +54,9 @@ fn run_timesteps() {
 
         // Iterate, in parallel, over target bodies. The loop over source bodies is handled
         // by the acceleration function.
-        // bodies.par_iter_mut().enumerate().for_each(|(id, body_target)| { // ...
-        for (id, target) in bodies.iter_mut().enumerate() {
+        bodies.par_iter_mut().enumerate().for_each(|(id, body_target)| {
             integrate(&config, &tree, target, id);
-        }
+        });
     }
 }
 
@@ -65,6 +65,8 @@ fn integrate(bh_config: &BhConfig, tree: &Tree, target: Body, id_target: usize) 
 
     // This acceleration function can be whatever you'd like. This example shows Newtonian
     // Gravity with MOND.
+    // `acc_fn` accepts parameters (position vector, mass or charge, distance), and outputs
+    // an acceleration vector.
     let acc_fn = |acc_dir, mass, dist| {
         acc_newton_with_mond(acc_dir, mass, dist, Some(mond_fn), softening_factor_sq)
     };
