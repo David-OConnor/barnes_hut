@@ -15,7 +15,11 @@ It uses the [lin_alg](https://crates.io/crates/lin_alg) library for the `Vec3` v
 
 Currently hard-coded for `f64`. Post an issue on GitHub if you'd like `f32` support.
 
-This library is generic over body type and acceleration function. Here's an example of adapting your type for use here:
+This library is used to compute force or acceleration between pairs of bodies. It can be used to compute electric, or gravitational force,
+for example. It can also be used to calculate gravitational acceleration directly, if set up as such using your `force` function.
+this represents the gravitational mass of the target body cancelling with its inertial mass. $a=f/m$
+
+It's generic over body type and force (or acceleration) function. Here's an example of adapting your type for use here:
 
 ```rust
 use lin_alg::f64::Vec3;
@@ -26,6 +30,7 @@ impl BodyModel for Body {
     }
 
     fn mass(&self) -> f64 {
+        // Or `self.charge`.
         self.mass
     }
 }
@@ -49,7 +54,8 @@ fn run_timesteps() {
     };
     
     for t in timesteps {
-        // Create the tree once per time step.
+        // Create the tree of source bodies once per time step. Note that for this example, source and target
+        // bodies are from the same set, but they don't have to be.
         let tree = Tree::new(&state.bodies, &bb, &state.config.bh_config);
 
         // Iterate, in parallel, over target bodies. The loop over source bodies is handled
@@ -63,18 +69,17 @@ fn run_timesteps() {
 fn integrate(bh_config: &BhConfig, tree: &Tree, target: Body, id_target: usize) {
     // ...
 
-    // This acceleration function can be whatever you'd like. This example shows Newtonian
+    // This force or acceleration function can be whatever you'd like. This example shows Newtonian
     // Gravity with MOND.
-    // `acc_fn` accepts parameters (position vector, mass or charge, distance), and outputs
-    // an acceleration vector.
-    let acc_fn = |acc_dir, mass, dist| {
+    // `force_fn` accepts parameters (position vector, source mass or charge,  distance), and outputs
+    // a force or acceleration vector.
+    let force_fn = |acc_dir, mass_src, dist| {
         acc_newton_with_mond(acc_dir, mass, dist, Some(mond_fn), softening_factor_sq)
     };
 
-    let accel = barnes_hut::acc_bh(
+    let accel = barnes_hut::run_bh(
         target.posit,
-        // `id_target` is used to prevent self-interaction.
-        id_target,
+        id_target, // `id_target` is used to prevent self-interaction.
         tree,
         bh_config,
         &acc_fn,

@@ -44,7 +44,7 @@ impl Default for BhConfig {
 }
 
 /// We use this to allow for arbitrary body (or particle etc) types in application code to
-/// use this library.
+/// use this library. Substitute `charge` for `mass` as required.
 pub trait BodyModel {
     fn posit(&self) -> Vec3;
     fn mass(&self) -> f64;
@@ -335,15 +335,18 @@ fn partition<'a, T: BodyModel>(
     result
 }
 
-/// Calculate acceleration using the Barnes Hut algorithm. The acceleration function passed
-/// as a parameter has signature `(acc_dir: Vec3 (unit), mass: f64, distance: f64) -> Vec3`
+/// Calculate force using the Barnes Hut algorithm. The force function passed
+/// as a parameter has signature `(acc_dir: Vec3 (unit), mass_src: f64, distance: f64) -> Vec3`
 /// `id_target` is the index in the body array used to make the tree; it prevents self-interaction.
-pub fn acc_bh<F>(
+/// Note that `mass` can be interchanged with `charge`, or similar.
+///
+/// When handling target mass or charge, reflect that in your `force_fn`; not here.
+pub fn run_bh<F>(
     posit_target: Vec3,
     id_target: usize,
     tree: &Tree,
     config: &BhConfig,
-    acc_fn: &F,
+    force_fn: &F,
 ) -> Vec3
 where
     F: Fn(Vec3, f64, f64) -> Vec3 + Send + Sync,
@@ -361,7 +364,7 @@ where
 
             let acc_dir = acc_diff / dist; // Unit vec
 
-            Some(acc_fn(acc_dir, leaf.mass, dist))
+            Some(force_fn(acc_dir, leaf.mass, dist))
         })
         .reduce(Vec3::new_zero, |acc, elem| acc + elem)
 }

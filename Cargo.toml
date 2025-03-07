@@ -1,6 +1,6 @@
 [package]
 name = "barnes_hut"
-version = "1.0.6"
+version = "1.0.7"
 edition = "2024"
 authors = ["David O'Connor <the_alchemist@fastmail.com>"]
 description = "Fast n-body simluation using the Barnes Hut algorithm"
@@ -19,7 +19,7 @@ exclude = [".gitignore"]
 
 
 [dependencies]
-#lin_alg = "^1.0.6"
+#lin_alg = "^1.0.8"
 lin_alg = { path="../lin_alg" }
 rayon = "^1.10.0"
 bincode = { version = "^2.0.0-rc.3", optional = true }
