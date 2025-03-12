@@ -306,7 +306,7 @@ fn center_of_mass<T: BodyModel>(bodies: &[&T]) -> (Vec3, f64) {
         center_of_mass /= mass;
     }
 
-    (center_of_mass, mass)
+    (center_of_mass / bodies.len() as f64, mass)
 }
 
 /// Partition bodies into each of the 8 octants.
