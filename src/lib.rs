@@ -35,10 +35,7 @@ impl Default for BhConfig {
         Self {
             θ: 0.5,
             max_bodies_per_node: 1,
-            max_tree_depth: 15, // todo put back
-                                // todo: You have having trouble with the recursion. I think your depth
-                                // todo cal logic is causing you to miss sections.
-                                // max_tree_depth: 30,
+            max_tree_depth: 15,
         }
     }
 }
@@ -275,6 +272,8 @@ impl Tree {
                 continue;
             }
 
+            // println!("Node i: {current_node_i} com: {}", node.center_of_mass);
+
             let dist = (posit_target - node.center_of_mass).magnitude();
 
             if node.bounding_box.width / dist < config.θ {
@@ -298,15 +297,14 @@ fn center_of_mass<T: BodyModel>(bodies: &[&T]) -> (Vec3, f64) {
 
     for body in bodies {
         mass += body.mass();
-        // Weight the center by mass.
         center_of_mass += body.posit() * body.mass();
     }
+
     if mass.abs() > f64::EPSILON {
-        // Remove the weighting's effect on magnitude of the center.
         center_of_mass /= mass;
     }
 
-    (center_of_mass / bodies.len() as f64, mass)
+    (center_of_mass, mass)
 }
 
 /// Partition bodies into each of the 8 octants.
