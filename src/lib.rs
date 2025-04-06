@@ -17,7 +17,7 @@ use bincode::{Decode, Encode};
 use lin_alg::f64::Vec3;
 use rayon::prelude::*;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 pub struct BhConfig {
     /// This determines how aggressively we group. It's no lower than 0. 0 means no grouping.
@@ -271,8 +271,6 @@ impl Tree {
                 result.push(node);
                 continue;
             }
-
-            // println!("Node i: {current_node_i} com: {}", node.center_of_mass);
 
             let dist = (posit_target - node.center_of_mass).magnitude();
 
