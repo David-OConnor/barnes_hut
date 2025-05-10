@@ -162,7 +162,7 @@ impl fmt::Display for Node {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 /// A recursive tree. Each node can be subdivided  Terminates with `NodeType::NodeTerminal`.
 pub struct Tree {
     /// Order matters; we index this by `Node::children`.
