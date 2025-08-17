@@ -19,6 +19,10 @@ This library is used to compute force or acceleration between pairs of bodies. I
 for example. It can also be used to calculate gravitational acceleration directly, if set up as such using your `force` function.
 this represents the gravitational mass of the target body cancelling with its inertial mass. $a=f/m$
 
+If you're using periodic boundary conditions, for example to model solvents in structural biology,
+this may not be appropriate; consider using SPME or similar. For example, in the [Ewald](https://github.com/david-oconnor/ewald)
+lib.
+
 It's generic over body type and force (or acceleration) function. Here's an example of adapting your type for use here:
 
 ```rust
