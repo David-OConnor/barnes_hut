@@ -2,6 +2,10 @@
 
 [![Crate](https://img.shields.io/crates/v/barnes_hut.svg)](https://crates.io/crates/barnes_hut)
 [![Docs](https://docs.rs/lin_alg/badge.svg)](https://docs.rs/barnes_hut)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15616833.svg)](https://doi.org/10.5281/zenodo.15616833)
+
+
+
 
 ![Visualization of cubes from this library](/tree.png)
 
